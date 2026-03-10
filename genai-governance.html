@@ -74,7 +74,7 @@ Services
 </div>
 </div>
 
-<button class="vibrant-blue-gradient text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg">Request Assessment</button>
+<button type="button" class="vibrant-blue-gradient text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg request-assessment-button">Request Assessment</button>
 
 </div>
 </nav>
@@ -122,5 +122,63 @@ Services
 <div class="text-center text-xs text-slate-400 mt-16">© 2026 FairAIServe</div>
 
 </footer>
+
+<!-- Email capture modal -->
+<div id="emailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white p-8 rounded-lg max-w-sm w-full">
+    <h2 class="text-xl font-bold mb-4">Request Assessment</h2>
+    <form id="emailForm">
+      <input type="email" id="emailInput" placeholder="Your email" required class="border p-2 w-full mb-4" />
+      <div class="flex justify-end">
+        <button type="submit" class="vibrant-blue-gradient text-white px-4 py-2 rounded">Submit</button>
+        <button type="button" id="modalClose" class="ml-2 text-sm text-gray-500">Cancel</button>
+      </div>
+    </form>
+    <p id="thankYou" class="mt-4 text-green-600 hidden">Thank you! We'll be in touch soon.</p>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('emailModal');
+  const openButtons = document.querySelectorAll('.request-assessment-button');
+  const closeButton = document.getElementById('modalClose');
+  const emailForm = document.getElementById('emailForm');
+  const thankYou = document.getElementById('thankYou');
+
+  function openModal() {
+    modal.classList.remove('hidden');
+    thankYou.classList.add('hidden');
+    emailForm.classList.remove('hidden');
+    emailForm.reset();
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+  }
+
+  openButtons.forEach(btn => btn.addEventListener('click', openModal));
+  closeButton.addEventListener('click', closeModal);
+
+  emailForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value;
+    fetch('http://localhost:3000/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email })
+    })
+    .then(() => {
+      thankYou.classList.remove('hidden');
+      emailForm.classList.add('hidden');
+      setTimeout(closeModal, 3000);
+    })
+    .catch(err => {
+      console.error('Error sending email', err);
+      thankYou.textContent = 'There was an error. Please try again later.';
+      thankYou.classList.remove('hidden');
+      setTimeout(closeModal, 3000);
+    });
+  });
+</script>
 </body>
 </html>
