@@ -6,6 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// debug log environment variables (help troubleshoot bad credentials)
+console.log('EMAIL_USER length:', process.env.EMAIL_USER ? process.env.EMAIL_USER.length : 0);
+console.log('EMAIL_PASS length:', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0);
+
 // configure transporter -- replace with real credentials or use environment variables
 let transporter;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
@@ -14,7 +18,9 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
-    }
+    },
+    logger: true,
+    debug: true // turn on for detailed output
   });
 } else {
   console.warn('EMAIL_USER/PASS not set; emails will not actually be sent.');
@@ -36,14 +42,34 @@ app.post('/submit', async (req, res) => {
 
   try {
     if (transporter) {
-      await transporter.sendMail(mailOptions);
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Mail sent:', info.response);
     } else {
       console.log('Received email request (no transporter configured):', email);
     }
     res.json({ success: true });
   } catch (err) {
     console.error('Error sending mail:', err);
-    res.status(500).json({ error: 'Failed to send notification' });
+    // include error message in response for easier debugging (don't expose in production)
+    res.status(500).json({ error: 'Failed to send notification', details: err.message });
+  }
+});
+
+// simple test endpoint to verify transporter configuration
+app.get('/test', async (req, res) => {
+  if (!transporter) {
+    return res.status(500).json({ error: 'transporter not configured' });
+  }
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER, // send to yourself
+      subject: 'Transporter test email',
+      text: 'This is a test message from FairAIServe backend.'
+    });
+    res.json({ success: true, info: info.response });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
