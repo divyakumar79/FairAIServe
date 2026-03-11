@@ -27,14 +27,19 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     logger: true,
     debug: true // turn on for detailed output
   });
+  console.log('Created mail transporter with service=gmail, user=', process.env.EMAIL_USER);
+  // dump entire config (excluding password) for debug
+  console.log('transporter.options', { ...transporter.options, auth: { user: transporter.options.auth.user, pass: '***' } });
 } else {
   console.warn('EMAIL_USER/PASS not set; emails will not actually be sent.');
   transporter = null;
 }
 
 app.post('/submit', async (req, res) => {
+  console.log('POST /submit body:', req.body);
   const { email } = req.body;
   if (!email) {
+    console.warn('submit called without email');
     return res.status(400).json({ error: 'Email is required' });
   }
 
@@ -56,8 +61,9 @@ app.post('/submit', async (req, res) => {
   }
 
   try {
+    console.log('Sending mail with options:', mailOptions);
     const info = await transporter.sendMail(mailOptions);
-    console.log('Mail sent:', info.response);
+    console.log('Mail sent:', info.response, info);
     res.json({ success: true });
   } catch (err) {
     console.error('Error sending mail:', err);
