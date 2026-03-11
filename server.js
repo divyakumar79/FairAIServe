@@ -84,7 +84,16 @@ app.get('/test', async (req, res) => {
   }
 });
 
+// simple logger middleware so we can see every request in the console
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
+  if (!transporter) {
+    console.warn('Warning: email transporter not configured.  Requests will be logged but not emailed.');
+  }
 });
