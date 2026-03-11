@@ -45,13 +45,19 @@ app.post('/submit', async (req, res) => {
     text: `A user has requested an assessment. Contact email: ${email}`
   };
 
+  // if transporter wasn't configured above we should treat it as an error so
+  // the client doesn't display a misleading "thank you" message
+  if (!transporter) {
+    console.warn('No transporter configured; request will not be emailed:', email);
+    return res.status(500).json({
+      error: 'Mail service not configured',
+      details: 'Set EMAIL_USER and EMAIL_PASS environment variables or configure SMTP'
+    });
+  }
+
   try {
-    if (transporter) {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('Mail sent:', info.response);
-    } else {
-      console.log('Received email request (no transporter configured):', email);
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Mail sent:', info.response);
     res.json({ success: true });
   } catch (err) {
     console.error('Error sending mail:', err);
