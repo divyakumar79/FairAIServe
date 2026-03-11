@@ -159,10 +159,8 @@ Services
   openButtons.forEach(btn => btn.addEventListener('click', openModal));
   closeButton.addEventListener('click', closeModal);
 
-  // compute the base URL for API calls in a resilient way
-  const apiBase = window.location.origin && window.location.origin !== 'null'
-    ? window.location.origin
-    : 'http://localhost:3000';
+  // POST back to the same host/port that served this page
+  const apiBase = '';
 
   emailForm.addEventListener('submit', e => {
     e.preventDefault();

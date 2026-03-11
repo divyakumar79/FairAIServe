@@ -426,13 +426,10 @@ FairAIServe helps enterprises and governments implement trustworthy AI systems a
   }));
   closeButton.addEventListener('click', closeModal);
 
-  // compute a sensible base URL for the backend.  When the page is served
-  // from the same host/port as the Node server, we can simply use a
-  // relative path.  If the file is opened directly (file://) we fall back to
-  // localhost:3000 so that development still works.
-  const apiBase = window.location.origin && window.location.origin !== 'null'
-    ? window.location.origin
-    : 'http://localhost:3000';
+  // always use relative URLs; the browser will request the same host/port
+  // from which the page was loaded.  This avoids any hard‑coded localhost
+  // when accessing the site from another device on the network.
+  const apiBase = '';
 
   emailForm.addEventListener('submit', e => {
     e.preventDefault();
