@@ -159,10 +159,12 @@ Services
   openButtons.forEach(btn => btn.addEventListener('click', openModal));
   closeButton.addEventListener('click', closeModal);
 
+  const apiBase = `${window.location.protocol}//${window.location.hostname}:3000`;
+
   emailForm.addEventListener('submit', e => {
     e.preventDefault();
     const email = document.getElementById('emailInput').value;
-    fetch('http://localhost:3000/submit', {
+    fetch(`${apiBase}/submit`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ email })

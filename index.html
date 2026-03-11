@@ -76,7 +76,7 @@ Services
 </div>
 </div>
 
-<button type="button" class="vibrant-blue-gradient text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg request-assessment-button">Request Assessment</button>
+curl http://localhost:3000/testcurl http://localhost:3000/test<button type="button" class="vibrant-blue-gradient text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg request-assessment-button">Request Assessment</button>
 
 </div>
 </nav>
@@ -421,12 +421,14 @@ FairAIServe helps enterprises and governments implement trustworthy AI systems a
   openButtons.forEach(btn => btn.addEventListener('click', openModal));
   closeButton.addEventListener('click', closeModal);
 
+  const apiBase = `${window.location.protocol}//${window.location.hostname}:3000`;
+
   emailForm.addEventListener('submit', e => {
     e.preventDefault();
     const email = document.getElementById('emailInput').value;
 
-    // send data to your server (replace URL with your endpoint)
-    fetch('http://localhost:3000/submit', {
+    // send data to backend using dynamic host
+    fetch(`${apiBase}/submit`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ email })
