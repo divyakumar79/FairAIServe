@@ -408,6 +408,7 @@ FairAIServe helps enterprises and governments implement trustworthy AI systems a
   const thankYou = document.getElementById('thankYou');
 
   function openModal() {
+    console.log('openModal called');
     modal.classList.remove('hidden');
     thankYou.classList.add('hidden');
     emailForm.classList.remove('hidden');
@@ -415,20 +416,34 @@ FairAIServe helps enterprises and governments implement trustworthy AI systems a
   }
 
   function closeModal() {
+    console.log('closeModal called');
     modal.classList.add('hidden');
   }
 
-  openButtons.forEach(btn => btn.addEventListener('click', openModal));
+  openButtons.forEach(btn => btn.addEventListener('click', e => {
+    console.log('request-assessment button clicked', e.target);
+    openModal();
+  }));
   closeButton.addEventListener('click', closeModal);
 
-  const apiBase = `${window.location.protocol}//${window.location.hostname}:3000`;
+  // compute a sensible base URL for the backend.  When the page is served
+  // from the same host/port as the Node server, we can simply use a
+  // relative path.  If the file is opened directly (file://) we fall back to
+  // localhost:3000 so that development still works.
+  const apiBase = window.location.origin && window.location.origin !== 'null'
+    ? window.location.origin
+    : 'http://localhost:3000';
 
   emailForm.addEventListener('submit', e => {
     e.preventDefault();
-    const email = document.getElementById('emailInput').value;
+    const email = document.getElementById('emailInput').value.trim();
+
+    if (!email) {
+      return; // the `required` attribute should normally prevent this
+    }
 
     // send data to your server (replace URL with your endpoint)
-     fetch(`${apiBase}/submit`, {
+    fetch(`${apiBase}/submit`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ email })

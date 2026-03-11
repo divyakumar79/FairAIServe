@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// serve the static HTML/CSS/JS files from the project root so that
+// the client and API share the same origin (avoids cross‑origin fetch issues)
+app.use(express.static(path.join(__dirname)));
 
 // debug log environment variables (help troubleshoot bad credentials)
 console.log('EMAIL_USER length:', process.env.EMAIL_USER ? process.env.EMAIL_USER.length : 0);

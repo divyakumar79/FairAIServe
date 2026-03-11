@@ -159,11 +159,14 @@ Services
   openButtons.forEach(btn => btn.addEventListener('click', openModal));
   closeButton.addEventListener('click', closeModal);
 
-  const apiBase = `${window.location.protocol}//${window.location.hostname}:3000`;
+  // compute the base URL for API calls in a resilient way
+  const apiBase = window.location.origin && window.location.origin !== 'null'
+    ? window.location.origin
+    : 'http://localhost:3000';
 
   emailForm.addEventListener('submit', e => {
     e.preventDefault();
-    const email = document.getElementById('emailInput').value;
+    const email = document.getElementById('emailInput').value.trim();
     fetch(`${apiBase}/submit`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
